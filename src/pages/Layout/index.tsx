@@ -1,26 +1,34 @@
-import { Box, Toolbar, useMediaQuery } from '@mui/material'
-import { useState } from 'react'
-import Header from '@/components/Header'
-import Sidebar from '@/components/Sidebar'
-import { Outlet } from 'react-router-dom'
-import Footer from '@/components/Footer'
+import { Box, Toolbar, useMediaQuery } from "@mui/material";
+import { useState } from "react";
+import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+import { useNavigate } from "react-router-dom";
+import Footer from "@/components/Footer";
+import RequireAuth from "../RequireAuth";
+import { useAppDispatch } from "@/store/store";
+import { signOut } from "@/store/slices/authSlice";
 
-const drawerWidth: number = 240
+const drawerWidth: number = 240;
 
 const Layout = () => {
-  const isNonMobile = useMediaQuery('(min-width: 600px')
-  const [open, setOpen] = useState(isNonMobile ? true : false)
+  const isNonMobile = useMediaQuery("(min-width: 600px");
+  const [open, setOpen] = useState(isNonMobile ? true : false);
+
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const toggleDrawer = () => {
-    setOpen(!open)
-  }
+    setOpen(!open);
+  };
 
   const SignOut = () => {
-    console.log('Sign Out')
-  }
+    dispatch(signOut()).then((_) => {
+      navigate("/signin", { replace: true });
+    });
+  };
 
   return (
-    <Box className='flex'>
+    <Box className="flex">
       <Header
         drawerWidth={drawerWidth}
         open={open}
@@ -32,26 +40,26 @@ const Layout = () => {
         toggleDrawer={toggleDrawer}
         SignOut={SignOut}
       />
-      <div className='flex flex-col'>
+      <div className="flex flex-col w-full">
         <Box
-          component='main'
+          component="main"
           sx={{
             backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
+              theme.palette.mode === "light"
                 ? theme.palette.grey[100]
                 : theme.palette.grey[900],
             flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto',
+            height: "100vh",
+            overflow: "auto",
           }}
         >
           <Toolbar />
-          <Outlet />
+          <RequireAuth />
         </Box>
         <Footer />
       </div>
     </Box>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;
